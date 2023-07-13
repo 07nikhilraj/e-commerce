@@ -4,6 +4,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ApiFeatures = require("../utils/apifeatures");
 const cloudinary = require("cloudinary");
 
+/*************************************************************************************************************************/
 // Create Product -- Admin
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
   // let images = [];
@@ -38,6 +39,7 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // Get All Product
 exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
   const resultPerPage = 8;
@@ -64,6 +66,7 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // Get All Product (Admin)
 exports.getAdminProducts = catchAsyncErrors(async (req, res, next) => {
   const products = await Product.find();
@@ -74,22 +77,26 @@ exports.getAdminProducts = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // Get Product Details
 exports.getProductDetails = catchAsyncErrors(async (req, res, next) => {
+  // Finding a product by its ID
   const product = await Product.findById(req.params.id);
 
+  // Checking if the product is not found
   if (!product) {
     return next(new ErrorHander("Product not found", 404));
   }
 
+  // Sending a JSON response with the product details
   res.status(200).json({
     success: true,
     product,
   });
 });
 
+/*************************************************************************************************************************/
 // Update Product -- Admin
-
 exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
 
@@ -140,8 +147,8 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // Delete Product
-
 exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
 
@@ -162,10 +169,13 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // Create New Review or Update the review
 exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
+  // Extracting review information from the request body
   const { rating, comment, productId } = req.body;
 
+  // Creating a review object
   const review = {
     user: req.user._id,
     name: req.user.name,
@@ -173,79 +183,91 @@ exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
     comment,
   };
 
+  // Finding the product by ID
   const product = await Product.findById(productId);
 
+  // Checking if the user has already reviewed the product
   const isReviewed = product.reviews.find(
     (rev) => rev.user.toString() === req.user._id.toString()
   );
 
+  // Updating the review if it already exists, otherwise adding a new review
   if (isReviewed) {
     product.reviews.forEach((rev) => {
-      if (rev.user.toString() === req.user._id.toString())
-        (rev.rating = rating), (rev.comment = comment);
+      if (rev.user.toString() === req.user._id.toString()) {
+        rev.rating = rating;
+        rev.comment = comment;
+      }
     });
   } else {
     product.reviews.push(review);
     product.numOfReviews = product.reviews.length;
   }
 
+  // Calculating the average rating of the product
   let avg = 0;
-
   product.reviews.forEach((rev) => {
     avg += rev.rating;
   });
-
   product.ratings = avg / product.reviews.length;
 
+  // Saving the updated product
   await product.save({ validateBeforeSave: false });
 
+  // Sending a JSON response indicating success
   res.status(200).json({
     success: true,
   });
 });
 
+/*************************************************************************************************************************/
 // Get All Reviews of a product
 exports.getProductReviews = catchAsyncErrors(async (req, res, next) => {
+  // Finding the product by ID
   const product = await Product.findById(req.query.id);
 
+  // Checking if the product is not found
   if (!product) {
     return next(new ErrorHander("Product not found", 404));
   }
 
+  // Sending a JSON response with the reviews of the product
   res.status(200).json({
     success: true,
     reviews: product.reviews,
   });
 });
 
+/*************************************************************************************************************************/
 // Delete Review
 exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
+  // Finding the product by ID
   const product = await Product.findById(req.query.productId);
 
+  // Checking if the product is not found
   if (!product) {
     return next(new ErrorHander("Product not found", 404));
   }
 
+  // Filtering out the review to be deleted
   const reviews = product.reviews.filter(
     (rev) => rev._id.toString() !== req.query.id.toString()
   );
 
+  // Calculating the average rating and number of reviews
   let avg = 0;
-
   reviews.forEach((rev) => {
     avg += rev.rating;
   });
-
   let ratings = 0;
-
   if (reviews.length === 0) {
     ratings = 0;
   } else {
     ratings = avg / reviews.length;
   }
-
   const numOfReviews = reviews.length;
 
+  // Updating the product with the modified review information
   await Product.findByIdAndUpdate(
     req.query.productId,
     {
@@ -260,6 +282,7 @@ exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
     }
   );
 
+  // Sending a JSON response indicating success
   res.status(200).json({
     success: true,
   });

@@ -6,9 +6,9 @@ const sendToken = require("../utils/jwtToken");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
 
+/*************************************************************************************************************************/
 // Register a User
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  // console.log('g')
   // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
   //   folder: "avatars",
   //   width: 150,
@@ -30,6 +30,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 201, res);
 });
 
+/*************************************************************************************************************************/
 // Login User
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
@@ -55,6 +56,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
+/*************************************************************************************************************************/
 // Logout User
 exports.logout = catchAsyncErrors(async (req, res, next) => {
   res.cookie("token", null, {
@@ -68,6 +70,7 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // Forgot Password
 // exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 //   const user = await User.findOne({ email: req.body.email });
@@ -108,6 +111,7 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 //   }
 // });
 
+/*************************************************************************************************************************/
 // Reset Password
 // exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 //   // creating token hash
@@ -143,6 +147,7 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 //   sendToken(user, 200, res);
 // });
 
+/*************************************************************************************************************************/
 // Get User Detail
 exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user.id);
@@ -152,6 +157,7 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // update User password
 // exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 //   const user = await User.findById(req.user.id).select("+password");
@@ -173,6 +179,7 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
 //   sendToken(user, 200, res);
 // });
 
+/*************************************************************************************************************************/
 // update User Profile
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
   const newUserData = {
@@ -210,6 +217,7 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // Get all users(admin)
 exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
   const users = await User.find();
@@ -220,6 +228,7 @@ exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // Get single user (admin)
 exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.params.id);
@@ -236,6 +245,7 @@ exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // update User Role -- Admin
 exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
   const newUserData = {
@@ -255,6 +265,7 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+/*************************************************************************************************************************/
 // Delete User --Admin
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.params.id);
@@ -276,3 +287,4 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
     message: "User Deleted Successfully",
   });
 });
+/*************************************************************************************************************************/
